@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Python 3.12 (Comunicacion-procesos-distribuidos-python)" />
+  </component>
+  <component name="GitLabMergeRequestsSettings"><![CDATA[{}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{}]]></component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Comunicacion-procesos-distribuidos-python)" project-jdk-type="Python SDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/Downloads/php-8.4.11-Win32-vs17-x64/php.ini">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+  </component>
+</project>
