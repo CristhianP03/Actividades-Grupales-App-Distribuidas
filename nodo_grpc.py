@@ -15,6 +15,11 @@ class NodoGRPC(nodo_pb2_grpc.NodoServiceServicer):
         self.lamport = 0
         self.lock    = threading.Lock()
 
+    def tick(self):
+        with self.lock:
+            self.lamport += 1
+            return self.lamport
+
     def update(self, received_ts):
         with self.lock:
             self.lamport = max(self.lamport, received_ts) + 1
@@ -37,6 +42,20 @@ class NodoGRPC(nodo_pb2_grpc.NodoServiceServicer):
         server.start()
         print(f"[Nodo {self.node_id}] Servidor gRPC activo en puerto {port}")
         return server
+
+    def send_to(self, target_id, message):
+        port    = PUERTOS[target_id]
+        ts      = self.tick()
+        channel = grpc.insecure_channel(f"localhost:{port}")
+        stub    = nodo_pb2_grpc.NodoServiceStub(channel)
+        msg     = nodo_pb2.Mensaje(
+            sender    = f"Nodo{self.node_id}",
+            timestamp = ts,
+            message   = message
+        )
+        resp = stub.Enviar(msg)
+        self.update(resp.timestamp)
+        channel.close()
 
 if __name__ == "__main__":
     node_id = int(sys.argv[1])
