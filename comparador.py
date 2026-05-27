@@ -16,6 +16,15 @@ class comparador:
                 latencias.append(float(fila[1]))
         return latencias
 
+def calcular_promedio(self, latencias):
+        return sum(latencias) / len(latencias)
+
+    def calcular_minimo(self, latencias):
+        return min(latencias)
+
+    def calcular_maximo(self, latencias):
+        return max(latencias)
+
 if __name__ == "__main__":
     tcp  = Comparador("resultados_nodo1_tcp.csv")
     grpc = Comparador("resultados_nodo1_grpc.csv")
