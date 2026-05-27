@@ -1,6 +1,6 @@
 import csv
 
-class comparador:
+class Comparador:
 
     def __init__(self, archivo_csv):
         self.archivo_csv = archivo_csv
@@ -16,7 +16,7 @@ class comparador:
                 latencias.append(float(fila[1]))
         return latencias
 
-def calcular_promedio(self, latencias):
+    def calcular_promedio(self, latencias):
         return sum(latencias) / len(latencias)
 
     def calcular_minimo(self, latencias):
