@@ -1,0 +1,522 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern}
+
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+
+\usepackage[dvipsnames,svgnames,table]{xcolor}
+\definecolor{teal600}{HTML}{0F6E56}
+\definecolor{teal50} {HTML}{E1F5EE}
+\definecolor{purple600}{HTML}{534AB7}
+\definecolor{purple50} {HTML}{EEEDFE}
+\definecolor{blue600}{HTML}{185FA5}
+\definecolor{blue50} {HTML}{E6F1FB}
+\definecolor{amber600}{HTML}{BA7517}
+\definecolor{amber50} {HTML}{FAEEDA}
+\definecolor{coral600}{HTML}{993C1D}
+\definecolor{coral50} {HTML}{FAECE7}
+\definecolor{gray600}{HTML}{5F5E5A}
+\definecolor{gray50} {HTML}{F1EFE8}
+\definecolor{codebg} {HTML}{F4F4F4}
+
+\usepackage{tikz}
+\usetikzlibrary{
+  shapes.geometric,
+  arrows.meta,
+  positioning,
+  fit,
+  backgrounds,
+  decorations.pathdashing,
+  calc
+}
+
+\tikzset{
+
+  msvc/.style={
+    rectangle, rounded corners=6pt,
+    minimum width=3.4cm, minimum height=1.1cm,
+    text width=3.2cm, align=center,
+    font=\footnotesize\bfseries,
+    draw, line width=0.5pt
+  },
+
+  msvc-teal/.style={
+    msvc,
+    fill=teal50, draw=teal600, text=teal600
+  },
+
+  msvc-purple/.style={
+    msvc,
+    fill=purple50, draw=purple600, text=purple600
+  },
+
+  msvc-blue/.style={
+    msvc,
+    fill=blue50, draw=blue600, text=blue600
+  },
+
+  msvc-amber/.style={
+    msvc,
+    fill=amber50, draw=amber600, text=amber600
+  },
+
+  msvc-coral/.style={
+    msvc,
+    fill=coral50, draw=coral600, text=coral600
+  },
+
+  msvc-gray/.style={
+    msvc,
+    fill=gray50, draw=gray600, text=gray600
+  },
+
+  actor/.style={
+    circle, minimum size=0.7cm,
+    fill=teal50, draw=teal600, text=teal600,
+    font=\scriptsize\bfseries
+  },
+
+  sync/.style={
+    -Stealth, thick, draw=blue600
+  },
+
+  async/.style={
+    -Stealth, thick, dashed, draw=amber600
+  },
+ 
+  internal/.style={
+    -Stealth, draw=teal600, line width=0.6pt
+  },
+
+  container/.style={
+    rectangle, rounded corners=8pt,
+    dashed, draw=teal600, line width=0.8pt,
+    inner sep=10pt
+  }
+}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\renewcommand{\arraystretch}{1.4}
+
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep, topsep=4pt}
+\setlist[enumerate]{noitemsep, topsep=4pt}
+
+\usepackage{listings}
+\lstset{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray600},
+  numbers=left, numberstyle=\tiny\color{gray600},
+  tabsize=2
+}
+
+
+\usepackage[hidelinks, colorlinks=true,
+  linkcolor=black, urlcolor=black,
+  citecolor=teal600]{hyperref}
+
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{infobox}[1][]{
+  colback=black50, colframe=black600,
+  boxrule=0.5pt, arc=4pt,
+  fonttitle=\bfseries\small,
+  title={#1}
+}
+\newtcolorbox{warnbox}[1][]{
+  colback=amber50, colframe=amber600,
+  boxrule=0.5pt, arc=4pt,
+  fonttitle=\bfseries\small,
+  title={#1}
+}
+
+\begin{document}
+
+
+\begin{titlepage}
+  \centering
+  \vspace*{1.5cm}
+  {\Large\bfseries\color{black}
+    Taller Formativo\\[0.4em]
+    Arquitectura de Microservicios\\[0.2em]
+    Notación C4 Nivel 3\\[1.5cm]}
+
+  {\large Sistema de Gestión de Solicitudes\\
+   de Soporte Técnico de Internet\\[2cm]}
+
+    \begin{flushleft}
+        \textbf{Equipo de trabajo:}\\[0.4cm]
+        \hspace{1cm}
+        \begin{minipage}{0.85\textwidth}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3cm}
+
+                    \item Cando Moreno Robinson Rodrigo \quad --- \quad Arquitecto Líder            
+                \item Luna Mora Ernesto Gregory \quad --- \quad Diseñador de Servicios
+
+                \item Pacheco Cárdenas Cristhian Daniel \quad --- \quad Responsable de Documentación
+            \end{itemize}
+        \end{minipage}
+    \end{flushleft}
+
+    \vspace{1.5cm}
+
+    \begin{flushleft}
+        \hspace{1cm}
+        \begin{tabular}{ll}
+            \textbf{Docente:} & Gleiston Cicerón Guerrero Ulloa \\[0.3cm]
+            \textbf{Período Académico:} & Séptimo Semestre \\[0.3cm]
+            \textbf{Fecha de Entrega:} & 3 de Junio 2026 \\
+        \end{tabular}
+    \end{flushleft}
+
+  \vfill
+  {\small\color{gray600}\today}
+\end{titlepage}
+
+
+\tableofcontents
+\newpage
+
+
+\section{Descripción del sistema propuesto}
+
+El sistema propuesto es una plataforma web orientada a la gestión estructurada de
+solicitudes de soporte técnico relacionadas con problemas en el servicio de Internet,
+dentro de entornos organizacionales que requieren trazabilidad, seguridad y eficiencia
+en la atención.
+
+\subsection{Perfiles de usuario}
+
+\begin{table}[H]
+\centering
+\caption{Roles del sistema y sus responsabilidades}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Rol} & \textbf{Responsabilidades} \\
+\midrule
+\textbf{Cliente}
+  & Registra solicitudes mediante formulario web, adjunta evidencias
+    (PNG, JPG, PDF) y realiza seguimiento del estado de sus casos. \\
+\textbf{Técnico}
+  & Accede únicamente a las solicitudes asignadas; actualiza el estado
+    (\emph{Pendiente}, \emph{Resuelta}) y registra acciones con marca
+    de fecha, hora y usuario. \\
+\textbf{Administrador}
+  & Supervisa todas las solicitudes, asigna técnicos manualmente y
+    tiene acceso completo a registros de auditoría y seguridad. \\
+\textbf{Superusuario}
+  & Gestión total de usuarios y roles: crea, modifica y elimina
+    cuentas, asigna perfiles. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Arquitectura de microservicios — C4 Nivel 3}
+
+\subsection{Principios de diseño aplicados}
+
+\begin{itemize}
+  \item \textbf{SRP} (\emph{Single Responsibility Principle}): cada microservicio
+        tiene exactamente una razón para cambiar.
+  \item \textbf{Database-per-service}: cada servicio posee su propio almacenamiento;
+        ningún servicio accede directamente a la base de datos de otro.
+  \item \textbf{API Gateway} como único punto de entrada externo, responsable de
+        enrutamiento, autenticación delegada y limitación de tasa.
+  \item \textbf{Comunicación síncrona} (REST/gRPC) para operaciones que requieren
+        respuesta inmediata; \textbf{comunicación asíncrona} (RabbitMQ) para
+        desacoplar productores de consumidores en eventos de dominio.
+\end{itemize}
+
+\subsection{Diagrama de componentes — C4 Nivel 3}
+
+\vspace{0.25cm}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=1.4cm and 1.8cm]
+
+  \node[actor] (user) {\textbf{C}};
+  \node[below=0.1cm of user, font=\scriptsize\bfseries\color{teal600}]
+        {Cliente};
+
+  \node[msvc-purple, right=2.2cm of user] (gw)
+        {\textbf{API Gateway}\\[2pt]
+         \scriptsize Punto de entrada\\REST/HTTPS};
+
+  \draw[sync] (user) -- node[above,font=\scriptsize\color{blue600}]
+        {REST} (gw);
+
+\vspace{0.50cm}
+
+  \begin{scope}[on background layer]
+    \node[container,
+          fit=(dummy),
+          minimum width=10cm, minimum height=7.8cm,
+          label={[font=\small\bfseries\color{teal600},
+                  inner sep=4pt]north:
+                  \guillemotleft microservicio\guillemotright\ Cliente
+                  \enspace·\enspace SRP: Gestión de solicitudes del cliente}
+         ] (ms-client-box) at (3.2,-3.8) {};
+  \end{scope}
+
+  \node[msvc-teal, below=1.8cm of gw] (ctrl)
+        {\textbf{Request Controller}\\[2pt]
+         \scriptsize Endpoints REST\\validación de payload};
+
+  \node[msvc-teal, right=1.6cm of ctrl] (svc)
+        {\textbf{Client Service}\\[2pt]
+         \scriptsize Reglas de negocio\\estado solicitudes};
+
+  \node[msvc-teal, below=1.3cm of ctrl] (fval)
+        {\textbf{File Validator}\\[2pt]
+         \scriptsize PNG/JPG/PDF\\límite de tamaño};
+
+  \node[msvc-teal, below=1.3cm of svc] (evtpub)
+        {\textbf{Event Publisher}\\[2pt]
+         \scriptsize Publica eventos\\a RabbitMQ};
+
+  \node[msvc-teal, below=1.3cm of fval] (repo)
+        {\textbf{Client Repository}\\[2pt]
+         \scriptsize Solicitudes\\archivos adjuntos};
+
+  % Flechas internas
+  \draw[internal] (gw)    -- node[left, font=\scriptsize\color{teal600}]
+        {REST·sync} (ctrl);
+  \draw[internal] (ctrl)  -- (svc);
+  \draw[internal] (ctrl)  -- (fval);
+  \draw[internal] (svc)   -- (evtpub);
+  \draw[internal] (fval)  -- (repo);
+  \draw[internal] (evtpub)-- (repo);
+
+  \node[msvc-amber, below=1.8cm of evtpub] (rmq)
+        {\textbf{RabbitMQ Broker}\\[2pt]
+         \scriptsize Cola async\\ticket.created};
+
+  \draw[async] (evtpub) -- node[right, font=\scriptsize\color{amber600}]
+        {async} (rmq);
+
+  \node[msvc-gray, right=2.2cm of gw] (auth)
+        {\textbf{Auth Service}\\[2pt]
+         \scriptsize JWT · roles\\gestión de sesión};
+
+  \draw[sync, draw=gray600] (gw) --
+        node[above, font=\scriptsize\color{gray600}]{gRPC·sync}
+        (auth);
+
+  \node[msvc-blue, right=2.2cm of svc] (ticket)
+        {\textbf{Ticket Service}\\[2pt]
+         \scriptsize Crea y asigna\\tickets de soporte};
+
+  \draw[sync] (svc) --
+        node[above, font=\scriptsize\color{blue600}]{gRPC·sync}
+        (ticket);
+
+  \draw[async] (rmq) |-
+        node[near end, right, font=\scriptsize\color{amber600}]{consume}
+        (ticket);
+
+  \node[msvc-coral, right=2.2cm of rmq] (notif)
+        {\textbf{Notif. Service}\\[2pt]
+         \scriptsize Email · push\\SRP};
+
+  \draw[async] (rmq) --
+        node[above, font=\scriptsize\color{amber600}]{consume}
+        (notif);
+
+  \node[msvc-teal, below=1.4cm of repo] (pg)
+        {\textbf{PostgreSQL}\\[2pt]
+         \scriptsize DB propia\\del servicio};
+
+  \draw[internal] (repo) -- (pg);
+
+  \node[msvc-teal, left=1.6cm of pg] (minio)
+        {\textbf{MinIO / S3}\\[2pt]
+         \scriptsize Archivos adjuntos\\PNG/JPG/PDF};
+
+  \draw[internal] (fval) |- (minio);
+
+\end{tikzpicture}
+}%
+\caption{Diagrama C4 Nivel 3 — Microservicio Cliente del sistema de soporte técnico.}
+\label{fig:c4-nivel3}
+\end{figure}
+
+\section{Descripción de microservicios}
+
+\subsection{Microservicio Cliente}
+\textbf{Responsabilidad única (SRP):}
+  Gestionar el ciclo de vida de las solicitudes de soporte enviadas por el usuario
+  cliente: registro, validación de archivos, consulta de estado y emisión del evento
+  de dominio \texttt{ticket.created}.
+
+
+\subsubsection{Componentes internos}
+
+\begin{table}[H]
+\centering
+\caption{Componentes del Microservicio Cliente}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Componente} & \textbf{Descripción} \\
+\midrule
+\texttt{Request Controller}
+  & Expone los endpoints REST (\texttt{POST /solicitudes},
+    \texttt{GET /solicitudes/\{id\}}). Valida el payload
+    entrante y delega al servicio de negocio. \\
+\texttt{Client Service}
+  & Orquesta la lógica de negocio: crea, consulta y actualiza
+    solicitudes. Coordina la validación de archivos y la
+    publicación de eventos. \\
+\texttt{File Validator}
+  & Verifica el tipo MIME real (magic bytes), la extensión
+    permitida (PNG, JPG, PDF) y el tamaño máximo configurable
+    antes de delegar el almacenamiento. \\
+\texttt{Event Publisher}
+  & Serializa y publica el evento de dominio
+    \texttt{ticket.created} en la cola de RabbitMQ.
+    Implementa el patrón \emph{outbox transaccional} para
+    garantizar entrega al menos una vez. \\
+\texttt{Client Repository}
+  & Capa de acceso a datos sobre PostgreSQL (propiedad
+    exclusiva del servicio). Gestiona solicitudes y metadatos
+    de archivos. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{API Gateway}
+
+Punto de entrada único para todos los clientes externos. Responsable de:
+enrutamiento de peticiones, validación de token JWT (delegando al
+\texttt{Auth Service} vía gRPC), limitación de tasa (\emph{rate limiting}) y
+terminación TLS.
+
+\subsection{Auth Service}
+
+Gestión de autenticación y autorización: emisión y validación de tokens JWT,
+control de roles (Cliente, Técnico, Administrador, Superusuario) y gestión de
+sesiones. Base de datos propia.
+
+\subsection{Ticket Service}
+
+Recibe el evento \texttt{ticket.created} de RabbitMQ y persiste el ticket en su
+propia base de datos. También responde a consultas síncronas del
+\texttt{Client Service} mediante gRPC para obtener el estado actual de un ticket.
+
+\subsection{Notif. Service}
+
+Consume el evento \texttt{ticket.created} y envía notificaciones al cliente
+(correo electrónico, push) confirmando la recepción de su solicitud.
+
+\section{Canales de comunicación y justificación tecnológica}
+
+
+\subsection{REST (síncrono)}
+
+\begin{itemize}
+  \item \textbf{Uso:} comunicación entre el navegador del cliente y el API Gateway;
+        desde el Gateway hacia el \texttt{Request Controller}.
+  \item \textbf{Justificación:} estándar ampliamente adoptado, soporte nativo de
+        adjuntos \texttt{multipart/form-data}, sencillo de consumir desde cualquier
+        frontend web sin dependencias adicionales.
+\end{itemize}
+
+\subsection{gRPC (síncrono)}
+
+\begin{itemize}
+  \item \textbf{Uso:} API Gateway → Auth Service; Client Service → Ticket Service.
+  \item \textbf{Justificación:} baja latencia gracias a Protocol Buffers (binario) y
+        HTTP/2. El contrato estricto mediante archivos \texttt{.proto} reduce errores
+        de integración entre servicios internos.
+\end{itemize}
+
+\subsection{RabbitMQ (asíncrono)}
+
+\begin{itemize}
+  \item \textbf{Uso:} Event Publisher → cola \texttt{ticket.created} → Ticket Service,
+        Notif. Service.
+  \item \textbf{Justificación frente a Kafka:} RabbitMQ es más apropiado para colas
+        de trabajo con enrutamiento flexible (exchanges y routing keys), menor latencia
+        en mensajes individuales y menor complejidad operacional para este dominio. Kafka
+        sería preferible si se requiriera retención de logs y streaming de alto volumen.
+  \item \textbf{Garantías:} entrega persistida, acknowledge manual, patrón
+        \emph{outbox transaccional} en el publicador.
+\end{itemize}
+\vspace{0.5cm}
+\section{Repositorio en GitHub}
+
+El Código en LaTex de la práctica se encuentra disponible en:
+ \url{https://github.com/CristhianP03/Actividades-Grupales-App-Distribuidas.git}
+
+\newpage
+
+
+\section{Referencias bibliográficas}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Taibi2017}
+D.~Taibi, V.~Lenarduzzi y C.~Pahl,
+``Processes, Motivations, and Issues for Migrating to Microservices
+Architectures: An Empirical Investigation,''
+\emph{IEEE Cloud Computing}, vol.~4, n.\textordmasculine~5, pp.~22--32, 2017.
+DOI: \href{https://doi.org/10.1109/MCC.2017.4250931}
+          {10.1109/MCC.2017.4250931}
+
+\bibitem{Dragoni2017}
+N.~Dragoni \textit{et al.},
+``Microservices: Yesterday, Today, and Tomorrow,''
+en \emph{Present and Ulterior Software Engineering},
+pp.~195--216, Springer, 2017.
+DOI: \href{https://doi.org/10.1007/978-3-319-67425-4_12}
+          {10.1007/978-3-319-67425-4\_12}
+
+\bibitem{Cerny2018}
+T.~Cerny, M.~J.~Donahoo y M.~Trnka,
+``Contextual Understanding of Microservice Architecture,''
+\emph{ACM SIGAPP Applied Computing Review}, vol.~17, n.\textordmasculine~4,
+pp.~29--45, 2018.
+DOI: \href{https://doi.org/10.1145/3183628.3183631}
+          {10.1145/3183628.3183631}
+
+\bibitem{Alshuqayran2016}
+N.~Alshuqayran, N.~Ali y R.~Evans,
+``A Systematic Mapping Study in Microservice Architecture,''
+en \emph{Proc. IEEE SOCA 2016}, pp.~44--51, 2016.
+DOI: \href{https://doi.org/10.1109/SOCA.2016.15}
+          {10.1109/SOCA.2016.15}
+
+\bibitem{Richardson2018}
+C.~Richardson,
+\emph{Microservices Patterns}.
+Manning Publications, 2018.
+ISBN: 978-1617294549.
+
+\bibitem{Montesi2016}
+F.~Montesi y J.~Weber,
+``Circuit Breakers, Discovery, and API Gateways in Microservices,''
+\emph{arXiv:1609.05830}, 2016.
+Disponible en: \href{https://arxiv.org/abs/1609.05830}
+                    {https://arxiv.org/abs/1609.05830}
+
+\end{thebibliography}
+
+\end{document}
