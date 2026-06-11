@@ -1,0 +1,572 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Paquetes de Configuración Técnica ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tocloft}
+
+% --- Definición de Colores para el Código Fuente ---
+\definecolor{javapurple}{rgb}{0.5, 0.0, 0.35}
+\definecolor{javagreen}{rgb}{0.2, 0.5, 0.25}
+\definecolor{javablue}{rgb}{0.1, 0.1, 0.8}
+\definecolor{backcolor}{rgb}{0.98, 0.98, 0.98}
+
+% --- Configuración Global de Listings (Código Fuente Detallado) ---
+\lstset{
+    backgroundcolor=\color{backcolor},
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{javapurple}\bfseries,
+    stringstyle=\color{javablue},
+    commentstyle=\color{javagreen},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=10pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    tabsize=2,
+    captionpos=b,
+    xleftmargin=15pt
+}
+
+% --- Configuración de Encabezados y PIE DE PÁGINA (CORREGIDO) ---
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize Universidad Técnica Estatal de Quevedo}
+\rhead{\footnotesize FORM-TL-03 | NetSupport ISP}
+\cfoot{Página \thepage} % Solo muestra el número de página actual
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Configuración de Títulos en NEGRO y NEGRITA (CORREGIDO) ---
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection.}{1em}{}
+
+\begin{document}
+
+% =========================================================================
+% PORTADA INSTITUCIONAL
+% =========================================================================
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO \par}
+    \vspace{0.4cm}
+    {\large FACULTAD DE CIENCIAS DE LA COMPUTACIÓN Y DISEÑO DIGITAL \par}
+    \vspace{0.2cm}
+    {\large CARRERA DE INGENIERÍA DE SOFTWARE \par}
+    \vfill
+    \rule{\linewidth}{0.8mm} \\[0.5cm]
+    {\huge \bfseries FORM-TL-03 --- TALLER INTEGRAL \par}
+    \vspace{0.4cm}
+    {\LARGE Diseño, Documentación y Desarrollo de API REST con OpenAPI 3.0 \par}
+    \vspace{0.6cm}
+    {\Large Caso de Estudio: \textbf{Ecosistema de Microservicios NetSupport ISP} \par}
+    \rule{\linewidth}{0.8mm} \\[1.5cm]
+    \vfill
+    \begin{flushleft}
+        \textbf{Asignatura:} Aplicaciones Distribuidas (ISR-701) \\
+        \textbf{Período Académico:} Regular 2025 -- 2026 SPA \\
+        \textbf{Semestre:} Séptimo Semestre - Ingeniería de Software \\
+        \vspace{0.4cm}
+        \textbf{Equipo de Trabajo:} \\
+        \begin{itemize}[label=--]
+            \item \textbf{Pacheco Cárdenas Cristhian Daniel}
+            \item \textbf{Luna Mora Ernesto Gregory} 
+            \item \textbf{Cando Moreno Robinson Rodrigo} 
+        \end{itemize}
+        \vspace{0.4cm}
+        \textbf{Docente Titular:} Gleiston Cicerón Guerrero Ulloa, M.Sc. \\
+        \textbf{Lugar y Fecha:} Quevedo, Los Ríos, Ecuador - Junio 2026
+    \end{flushleft}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+% =========================================================================
+% CAPÍTULO 1: INTRODUCCIÓN
+% =========================================================================
+\section{Propósito del taller y resultado esperado}
+El presente documento constituye la entrega técnica integral del taller \textbf{FORM-TL-03}, el cual tiene como eje central el diseño riguroso de una arquitectura orientada a servicios (SOA) mediante la implementación de microservicios RESTful. El objetivo es transicionar de un modelo conceptual a una infraestructura funcional capaz de gestionar procesos críticos de un ISP (Internet Service Provider) con alta disponibilidad.
+
+\subsection{Resultados Esperados}
+\begin{enumerate}
+    \item \textbf{Diseño Contract-First:} Definición formal de la interfaz mediante OpenAPI 3.0 antes de la codificación de lógica de negocio.
+    \item \textbf{Interoperabilidad de Servicios:} Garantizar que los microservicios (Auth, Ticket, AI, Notif) se comuniquen de forma transparente.
+    \item \textbf{Seguridad Industrial:} Implementación de filtros de seguridad basados en JWT (JSON Web Tokens) y RBAC.
+    \item \textbf{Resiliencia y Tolerancia a Fallos:} Aplicación de patrones como Circuit Breaker (Resilience4j) para evitar caídas en cascada.
+\end{enumerate}
+
+\section{Caso de estudio: NetSupport ISP}
+El sistema \textbf{NetSupport} es una plataforma de misión crítica diseñada para automatizar el ciclo de vida del soporte técnico. En un entorno de ISP, la velocidad de respuesta ante fallas es el factor diferenciador. El ecosistema NetSupport permite la recepción de tickets, el análisis de sentimiento y prioridad mediante modelos de IA, y el despacho automático a técnicos basándose en geolocalización y carga de trabajo.
+
+% =========================================================================
+% CAPÍTULO 3: INFRAESTRUCTURA (PASO 0)
+% =========================================================================
+\section{Paso 0 --- Infraestructura desde Cero}
+\subsection{Arquitectura de Microservicios y Flujo de Datos}
+La arquitectura de NetSupport sigue un patrón de \textbf{Event-Driven Architecture (EDA)} para desacoplar procesos pesados de la respuesta inmediata al cliente. 
+
+\begin{itemize}
+    \item \textbf{API Gateway:} Punto único de entrada. Valida el token con el Auth-Service.
+    \item \textbf{Ticket-Service:} Microservicio Core que persiste en PostgreSQL y emite eventos a Kafka.
+    \item \textbf{AI-Service:} Microservicio en Python que clasifica la falla mediante procesamiento de lenguaje natural (NLP).
+    \item \textbf{Notification-Service:} Suscriptor de eventos que despacha notificaciones Push y correos electrónicos.
+\end{itemize}
+
+\subsection{Dependencias del Ecosistema: pom.xml}
+A continuación se presenta el archivo maestro de dependencias que asegura la compatibilidad entre Java 25 y Spring Boot 4.
+
+\begin{lstlisting}[language=XML, caption=Archivo pom.xml - Dependencias Críticas]
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.0</version>
+    </parent>
+    <groupId>com.uteq.netsupport</groupId>
+    <artifactId>ticket-service</artifactId>
+    <version>2.5.0-RELEASE</version>
+
+    <properties>
+        <java.version>25</java.version>
+        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <resilience4j.version>2.2.0</resilience4j.version>
+    </properties>
+
+    <dependencies>
+        <!-- Starters de Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Mensajeria Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- JWT y Seguridad -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
+        <!-- Base de Datos y Resiliencia -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>${resilience4j.version}</version>
+        </dependency>
+
+        <!-- Utilidades -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
+\end{lstlisting}
+
+\newpage
+\subsection{Orquestación con Docker Compose}
+Se define la infraestructura multicontenedor para simular el entorno de producción en desarrollo local.
+
+\begin{lstlisting}[language=XML, caption=docker-compose.yml - Infraestructura de Red]
+version: '3.9'
+services:
+  auth-db:
+    image: postgres:18-alpine
+    container_name: netsupport-auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: admin_auth
+      POSTGRES_PASSWORD: auth_secure_pass
+    networks: [netsupport-mesh]
+
+  ticket-db:
+    image: postgres:18-alpine
+    container_name: netsupport-ticket-db
+    environment:
+      POSTGRES_DB: ticket_db
+      POSTGRES_USER: admin_ticket
+      POSTGRES_PASSWORD: ticket_secure_pass
+    volumes:
+      - ./infra/init-tickets.sql:/docker-entrypoint-initdb.d/init.sql
+    networks: [netsupport-mesh]
+
+  kafka-broker:
+    image: confluentinc/cp-kafka:7.6.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092
+    networks: [netsupport-mesh]
+
+networks:
+  netsupport-mesh:
+    driver: bridge
+\end{lstlisting}
+
+\newpage
+\subsection{Capa de Persistencia: Esquema SQL Detallado}
+\begin{lstlisting}[language=SQL, caption=Script SQL de Inicialización de Tickets]
+-- Extension para manejo de UUIDs
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tabla Maestra de Tecnicos
+CREATE TABLE technicians (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    full_name VARCHAR(120) NOT NULL,
+    specialization VARCHAR(60) NOT NULL,
+    status VARCHAR(20) DEFAULT 'AVAILABLE',
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Tabla Core de Tickets de Soporte
+CREATE TABLE tickets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(50), 
+    priority VARCHAR(20),
+    status VARCHAR(30) DEFAULT 'NEW',
+    client_id UUID NOT NULL,
+    technician_id UUID REFERENCES technicians(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Datos Semilla
+INSERT INTO technicians (full_name, specialization, email) VALUES 
+('Ing. Cristhian Pacheco', 'Infraestructura Fibra', 'cpacheco@netsupport.ec'),
+('Ing. Carlos Carpio', 'Soporte Nivel 2', 'ccarpio@netsupport.ec');
+\end{lstlisting}
+
+\newpage
+\section{Implementación del Backend: Capa de Dominio y Seguridad}
+\subsection{Modelado de Entidades (JPA/Lombok)}
+\begin{lstlisting}[language=Java, caption=Entidad de Negocio: Ticket.java]
+package com.uteq.netsupport.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "tickets")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Ticket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, length = 150)
+    private String title;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatus status = TicketStatus.NEW;
+
+    private String priority;
+
+    @Column(name = "client_id", nullable = false)
+    private UUID clientId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "technician_id")
+    private Technician assignedTechnician;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+}
+\end{lstlisting}
+
+\newpage
+\subsection{Configuración de Seguridad Spring Security 7}
+Se implementa una arquitectura Stateless basada en filtros JWT para proteger los endpoints de soporte.
+
+\begin{lstlisting}[language=Java, caption=Clase de Configuracion de Seguridad]
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/tickets/**").hasRole("USER")
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .build();
+    }
+}
+\end{lstlisting}
+
+\section{Paso 1 --- Identificar Recursos y Diseño de URIs}
+En esta fase, mapeamos el dominio de soporte técnico a una interfaz RESTful semántica.
+
+\begin{longtable}{@{}lll@{}}
+\caption{Matriz de Diseño de URIs RESTful NetSupport} \\ \toprule
+\textbf{Incorrecto (Estilo RPC)} & \textbf{Correcto (RESTful)} & \textbf{Justificación Técnica} \\ \midrule
+POST /createTicket & POST /tickets & Verbo HTTP define la acción. \\
+GET /getAllPendingTickets & GET /tickets?status=NEW & Filtros vía Query Params. \\
+POST /assignTechToTicket & POST /tickets/\{id\}/assign & Recurso como sub-entidad. \\
+DELETE /removeTicket/10 & DELETE /tickets/10 & Semántica nativa de DELETE. \\ \bottomrule
+\end{longtable}
+
+\section{Paso 2 --- Tabla de Endpoints del Microservicio}
+\begin{longtable}{@{}llll@{}}
+\caption{Catálogo de Endpoints de NetSupport} \\ \toprule
+\textbf{Método} & \textbf{Ruta} & \textbf{Input (DTO)} & \textbf{Output (Status)} \\ \midrule
+POST & /auth/login & LoginRequest & 200 Ok (Token JWT) \\
+GET & /tickets & Query (page, size) & 200 Ok (Listado) \\
+POST & /tickets & TicketRequest & 201 Created \\
+GET & /tickets/\{id\} & PathVariable & 200 Ok / 404 \\
+PATCH & /tickets/\{id\} & PartialUpdate & 200 Ok / 400 \\
+DELETE & /tickets/\{id\} & PathVariable & 204 No Content \\ \bottomrule
+\end{longtable}
+
+\newpage
+\section{Paso 3 --- Contrato OpenAPI 3.0 (Especificación YAML)}
+El contrato formal es la base para la interoperabilidad entre microservicios.
+
+\begin{lstlisting}[language=XML, caption=main-contract.yaml - Especificacion OpenAPI]
+openapi: 3.0.3
+info:
+  title: NetSupport Tech API - ISP Solution
+  version: 2.1.0
+  description: API Integral de Gestion de Tickets de Soporte Tecnico.
+  contact:
+    name: Departamento de Arquitectura UTEQ
+    email: soporte@netsupport.ec
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: API Gateway de Desarrollo Local
+
+tags:
+  - name: Autenticacion
+    description: Gestion de sesiones y tokens.
+  - name: Soporte
+    description: Ciclo de vida de incidencias.
+
+paths:
+  /auth/login:
+    post:
+      tags: [Autenticacion]
+      summary: Iniciar sesion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /tickets:
+    get:
+      tags: [Soporte]
+      summary: Listar tickets paginados
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Soporte]
+      summary: Reportar nueva incidencia
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreate'
+      responses:
+        '201':
+          description: Creado con exito.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+    TicketCreate:
+      type: object
+      required: [title, description]
+      properties:
+        title: {type: string, minLength: 10}
+        description: {type: string}
+\end{lstlisting}
+
+\newpage
+\section{Paso 4 --- Implementación de Controladores y Lógica Kafka}
+Se presenta el controlador core encargado de la persistencia y la emisión de eventos asíncronos.
+
+\begin{lstlisting}[language=Java, caption=Controlador Principal: TicketController.java]
+@RestController
+@RequestMapping("/api/v1/tickets")
+@RequiredArgsConstructor
+public class TicketController {
+
+    private final TicketService ticketService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @CircuitBreaker(name = "ticketService", fallbackMethod = "handleFallback")
+    public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request) {
+        // Guardado Sincrono
+        Ticket ticket = ticketService.save(request);
+        
+        // Notificacion Asincrona via Kafka para analisis de IA
+        String event = "{\"ticketId\": \"" + ticket.getId() + "\"}";
+        kafkaTemplate.send("ticket.created", event);
+        
+        return ResponseEntity.status(201).body(new TicketResponse(ticket));
+    }
+
+    public ResponseEntity<TicketResponse> handleFallback(Exception e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+}
+\end{lstlisting}
+
+\section{Paso 5 --- Manejo Uniforme de Errores}
+\begin{lstlisting}[language=Java, caption=Manejador Global de Excepciones]
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, WebRequest request) {
+        ApiError error = ApiError.builder()
+            .status(404)
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build();
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+}
+\end{lstlisting}
+
+\newpage
+\section{Paso 6 --- Colección Postman para Pruebas}
+Se detalla un fragmento de la colección de pruebas para validar los flujos de seguridad y creación.
+
+\begin{lstlisting}[language=XML, caption=Fragmento de postman_collection.json]
+{
+	"info": {
+		"name": "NetSupport API Test Suite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autenticacion",
+			"item": [
+				{
+					"name": "Login Exitoso",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin@netsupport.ec\", \"password\": \"Secret123!\"}"
+						},
+						"url": "{{baseUrl}}/auth/login"
+					}
+				}
+			]
+		},
+		{
+			"name": "Soporte",
+			"item": [
+				{
+					"name": "Crear Ticket de Falla",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/tickets"
+					}
+				}
+			]
+		}
+	]
+}
+\end{lstlisting}
+
+\section{Madurez de Richardson y Conclusiones}
+NetSupport se posiciona en el \textbf{Nivel 3} de madurez al implementar HATEOAS. Las respuestas de la API incluyen hipervínculos dinámicos que guían al cliente en las posibles transiciones de estado del ticket, garantizando una interfaz autodescriptiva y desacoplada del conocimiento previo de las URIs.
+
+\section{Referencias Bibliográficas}
+\begin{itemize}
+    \item [1] R. T. Fielding, ``Architectural styles and the design of network-based software architectures,'' Ph.D. dissertation, 2000.
+    \item [2] M. Fowler, ``Richardson Maturity Model: Steps toward the glory of REST,'' Mar. 2010.
+    \item [3] OpenAPI Initiative, ``OpenAPI Specification v3.0.3,'' Feb. 2020.
+\end{itemize}
+
+\end{document}
